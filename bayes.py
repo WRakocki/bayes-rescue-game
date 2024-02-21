@@ -24,8 +24,9 @@ class Search():
             print("Can't load map image file {}".format(MAP_FILE), file=sys.stderr)
             sys.exit(1)
         
+        #Actual location of the sailor
         self.area_actual = 0
-        self.sailor_actial = [0, 0]
+        self.sailor_actual = [0, 0]
 
         #Local coordinates in the search area
         self.sa1 = self.img[SA1_CORNERS[1] : SA1_CORNERS[3],
@@ -68,11 +69,17 @@ class Search():
         cv.moveWindow('Areas to search', 750, 10)
         cv.waitKey(500)
 
-def main():
-    app = Search("Bayes")
-    app.draw_map((50, 30))
+    def sailor_final_location(self, num_search_areas):
+        """Returns coordinates x and y of actual location of the sailor"""
+        #Finds coordinates of the sailor relative to the search area subarray
+        self.sailor_actual[0] = np.random.choice(self.sa1.shape[1], 1)
+        self.sailor_actual[1] = np.random.choice(self.sa1.shape[0], 1)
 
-if __name__ == '__main__':
-    main()
+        area = int(random.triangular(1, num_search_areas + 1))
+
+        if area == 1:
+            x = self.sailor_actual[0] + SA1_CORNERS[0]
+            y = self.sailor_actual[1] + SA1_CORNERS[1]
+            self.area_actual = 1
 
 
