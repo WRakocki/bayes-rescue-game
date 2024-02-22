@@ -110,3 +110,115 @@ class Search():
             return 'Found in area number {}.'.format(area_num), coords
         else:
             return 'Not found', coords
+        
+    def revise_target_probs(self):
+        """
+        Updates propability for each area based on search effectiveness
+        """
+        denom = self.p1 * (1 - self.sep1) + self.p2 * (1 - self.sep2) + self.p3 * (1 - self.sep3)
+        self.p1 = self.p1 * (1 - self.sep1) / denom
+        self.p2 = self.p2 * (1 - self.sep2) / denom
+        self.p3 = self.p3 * (1 - self.sep3) / denom
+
+def draw_menu(search_num):
+    """Prints the menu with the selection of area to be searched""" 
+    print('Attempt number {}'.format(search_num))
+    
+    print(
+        """
+        Choose next area to search:
+
+        0 - Exit the program
+        1 - Search first area twice
+        2 - Search second area twice
+        3 - Search third area twice
+        4 - Search first and second area
+        5 - Search first and third area
+        6 - Search second and third area
+        7 - Start from beggining
+        """
+
+    )  
+
+def main():
+    app = Search('Cape_Python')
+    app.draw_map(last_known=(160, 290))
+    sailor_x, sailor_y = app.sailor_final_location(num_search_areas=3)
+    print("-" * 65)
+    print("\nInitial probability estimate (P):")
+    print("P1 = {:.3f}, P2 = {:.3f}, P3 = {:.3f}".format(app.p1, app.p2, app.p3))
+    search_num = 1
+
+    while True:
+        app.calc_search_effectiveness()
+        draw_menu(search_num)
+        choice = input("Choose an option: ")
+
+        if choice == "0":
+            sys.exit()
+        
+        elif choice == "1":
+            results_1, coords_1 = app.conduct_search(1, app.sa1, app.sep1)
+            results_2, coords_2 = app.conduct_search(1, app.sa1, app.sep1)
+            app.sep1 = (len(set(coords_1 + coords_2))) / (len(app.sa1) ** 2)
+            app.sep2 = 0
+            app.sep3 = 0
+
+        elif choice == "2":
+            results_1, coords_1 = app.conduct_search(1, app.sa2, app.sep2)
+            results_2, coords_2 = app.conduct_search(1, app.sa2, app.sep2)
+            app.sep1 = 0
+            app.sep2 = (len(set(coords_1 + coords_2))) / (len(app.sa2) ** 2)
+            app.sep3 = 0
+
+        elif choice == "3":
+            results_1, coords_1 = app.conduct_search(1, app.sa3, app.sep3)
+            results_2, coords_2 = app.conduct_search(1, app.sa3, app.sep3)
+            app.sep1 = 0
+            app.sep2 = 0
+            app.sep3 = (len(set(coords_1 + coords_2))) / (len(app.sa3) ** 2)
+        
+        elif choice == "4":
+            results_1, coords_1 = app.conduct_search(1, app.sa1, app.sep1)
+            results_2, coords_2 = app.conduct_search(1, app.sa2, app.sep2)
+            app.sep3 = 0
+        
+        elif choice == "5":
+            results_1, coords_1 = app.conduct_search(1, app.sa1, app.sep1)
+            results_2, coords_2 = app.conduct_search(1, app.sa3, app.sep3)
+            app.sep2 = 0
+
+        elif choice == "6":
+            results_1, coords_1 = app.conduct_search(1, app.sa2, app.sep2)
+            results_2, coords_2 = app.conduct_search(1, app.sa3, app.sep3)
+            app.sep1 = 0
+
+        elif choice == "7":
+            main()
+
+        else:
+            print("\nIt is not correct choice.", file=sys.stderr)
+            continue
+        
+        #Uses Bayes Theorem to update probability
+        app.revise_target_probs()
+
+        print("\nAttempt number {} - result: {}".format(search_num, results_1), file=sys.stderr)
+        print("\nAttempt number {} - result: {}".format(search_num, results_2), file=sys.stderr)
+        print("Search effectiveness (E) for attempt number {}:".format(search_num))
+        print("E1 = {:.3f}, E2 = {:.3f}, E3 = {:.3f}".format(app.sep1, app.sep2, app.sep3))
+
+        if results_1 == "Not found" and results_2 == "Not found":
+            print("\nNew probability estimate: (P) " "for attempt number {}:".format(search_num + 1))
+            print("P1 = {:.3f}, P2 = {:.3f}, P3 = {:.3f}".format(app.p1, app.p2, app.p3))
+        else:
+            cv.circle(app.img, (sailor_x[0], sailor_y[0]), 3, (255, 0, 0), -1)
+            cv.imshow('Areas to search', app.img)
+            cv.waitKey(1500)
+            main()
+        search_num += 1
+
+if __name__ == '__main__':
+    main()
+
+
