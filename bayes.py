@@ -90,3 +90,23 @@ class Search():
         
         return x, y
 
+    def calc_search_effectiveness(self):
+        """
+        Specifies a decimal value representing search effectiveness for each area
+        """
+        self.sep1 = random.uniform(0.2, 0.9)
+        self.sep2 = random.uniform(0.2, 0.9)
+        self.sep3 = random.uniform(0.2, 0.9)
+
+    def conduct_search(self, area_num, area_array, effectiveness_prob):
+        """Returns result of search and list of search coordinates"""
+        local_y_range = range(area_array.shape[0])
+        local_x_range = range(area_array.shape[1])
+        coords = list(itertools.product(local_x_range, local_y_range))
+        random.shuffle(coords)
+        coords = coords[:int((len(coords) * effectiveness_prob))]
+        loc_actual = (self.sailor_actual[0], self.sailor_actual[1])
+        if area_num == self.area_actual and loc_actual in coords:
+            return 'Found in area number {}.'.format(area_num), coords
+        else:
+            return 'Not found', coords
