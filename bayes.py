@@ -110,7 +110,7 @@ class Search():
         coords = list(itertools.product(local_x_range, local_y_range))
         for cord in coords:
             for searched_coord in searched_coords:
-                if cord == searched_coords:
+                if cord == searched_coord:
                     coords.remove(cord)
         random.shuffle(coords)
         coords = coords[:int((len(coords) * effectiveness_prob))]
