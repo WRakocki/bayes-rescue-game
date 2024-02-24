@@ -157,6 +157,8 @@ class Search():
         )
 
     def run_game(self):
+        self.draw_map(last_known=(160, 290))
+        
         sailor_x, sailor_y = self.sailor_final_location(num_search_areas=3)
         print("-" * 65)
         print("\nInitial probability estimate (P):")
@@ -234,7 +236,6 @@ class Search():
 
 def main():
     app = Search('Cape_Python')
-    app.draw_map(last_known=(160, 290))
     app.run_game()
     
 
