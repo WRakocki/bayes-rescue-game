@@ -120,7 +120,6 @@ class Search():
         
         #Storing already searched coordinates
         self.searched_coords[area_num-1] = list(set(self.searched_coords[area_num-1] + coords))
-        print(self.searched_coords)
 
         loc_actual = (self.sailor_actual[0], self.sailor_actual[1])
         if area_num == self.area_actual and loc_actual in coords:
