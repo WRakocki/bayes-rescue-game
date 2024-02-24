@@ -48,7 +48,8 @@ class Search():
         self.sep2 = 0
         self.sep3 = 0
 
-        self.searched_coords = []
+        #Stores searched coords for each area in 2d array
+        self.searched_coords = [[], [], []]
     
     def draw_map(self, last_known):
         """
@@ -108,13 +109,19 @@ class Search():
         local_y_range = range(area_array.shape[0])
         local_x_range = range(area_array.shape[1])
         coords = list(itertools.product(local_x_range, local_y_range))
+        #Deleting already searched coordinates from list of all coordinates
         for cord in coords:
-            for searched_coord in searched_coords:
+            for searched_coord in self.searched_coords[area_num-1]:
                 if cord == searched_coord:
                     coords.remove(cord)
+
         random.shuffle(coords)
         coords = coords[:int((len(coords) * effectiveness_prob))]
-        self.searched_coords = set(searched_coords + coords)
+        
+        #Storing already searched coordinates
+        self.searched_coords[area_num-1] = list(set(self.searched_coords[area_num-1] + coords))
+        print(self.searched_coords)
+
         loc_actual = (self.sailor_actual[0], self.sailor_actual[1])
         if area_num == self.area_actual and loc_actual in coords:
             return 'Found in area number {}.'.format(area_num), coords
